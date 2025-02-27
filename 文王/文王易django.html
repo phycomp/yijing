@@ -1,0 +1,248 @@
+{%extends 'base.html'%}
+{%load static utils%}
+{%block STYLE%}
+<style>
+#container{display:flex; flex-direction:column;}
+/*body{background:green; align-items:center;}
+main{flex-direction:column}*/
+
+.rowContainer{display:flex; flex-direction:row; padding-bottom:5px; }
+.rowContainer:nth-child(even){color:yellow}
+.rowContainer:nth-child(odd){color:white}
+.rowContainer div:nth-child(odd){padding-left:5px; color:#00ffff}
+.hexaICON{position:absolute; top:-5px; right:8px; font-size:-webkit-xxx-large; background:lightgreen; }
+.rowContainer div a{font-size:20px; }
+.占卦 div{display:flex; align-items:center; font-size:xx-large; text-align:center; color:yellow; padding-right:2px }
+.hexaSymbl{margin:auto; display:flex;}
+input[name=hexaQuery]{margin-right:3px; }
+.slimHexa{width:100px; height:10px}
+</style>
+{%endblock STYLE%}
+{%block SCRIPT%}
+<script>
+//hexaGram=''
+//yinURL='&#x2015;'
+//yangURL='&#x254D;'
+yang="<img class=slimHexa src='{{MEDIA_URL}}/medium/yin.png'>";
+yangURL='{{MEDIA_URL}}/medium/yin.png'
+yin="<img class=slimHexa src='{{MEDIA_URL}}/medium/yang.png'>";
+yinURL='{{MEDIA_URL}}/medium/yang.png'
+isHexible=true
+hexaQuery=document.querySelector('input[name=hexaQuery]')
+初爻=document.querySelector('.本卦初爻')
+二爻=document.querySelector('.本卦二爻')
+三爻=document.querySelector('.本卦三爻')
+四爻=document.querySelector('.本卦四爻')
+五爻=document.querySelector('.本卦五爻')
+上爻=document.querySelector('.本卦上爻')
+卦名=document.querySelector('.本卦卦名')
+卦數=document.querySelector('.本卦卦數')
+爻變初爻=document.querySelector('.爻變初爻')
+爻變二爻=document.querySelector('.爻變二爻')
+爻變三爻=document.querySelector('.爻變三爻')
+爻變四爻=document.querySelector('.爻變四爻')
+爻變五爻=document.querySelector('.爻變五爻')
+爻變上爻=document.querySelector('.爻變上爻')
+爻變卦名=document.querySelector('.爻變卦名')
+爻變卦數=document.querySelector('.爻變卦數')
+HEXA=[初爻, 二爻, 三爻, 四爻, 五爻, 上爻]
+ngtnHEXA=[爻變初爻, 爻變二爻, 爻變三爻, 爻變四爻, 爻變五爻, 爻變上爻]
+//nameHEXA=['初爻', '二爻', '三爻', '四爻', '五爻', '上爻']
+hexaGram=[]; ngtnHexa=[]; idx=0; hexaNum='', ngtnNum=''
+本卦=document.querySelector('.本卦')
+爻變=document.querySelector('.爻變')
+//爻變.style='display:none'
+var regexp=/y\w{2,3}.png/;
+var targetHexa; isNgtn=true
+function resetHex(obj){
+	HEXA.forEach(function(elmnt, idx) { elmnt.innerHTML='' })
+	if(targetHexa) targetHexa.removeEventListener('click', function(evt){evt.preventDefault()}, false)
+		//ngtnHEXA[idx].innerHTML=''
+		/*if (txtarea.value||attached.files.length)
+			{ xhr.data_sent(url, formdata);
+				xhr.onreadystatechange=function(evt)
+				{ if(this.readyState==4 && this.status==200) { rspData=JSON.parse(this.responseText);
+					if (rspData.PostUpdated) window.location=url//blogEdit.reset()//innerHTML="<div style='color:red'>Post Updated</div>";
+					else console.log('Post Not Updated') }
+				}
+			}*/
+	//});
+	idx=0; isHexible=true; hexaGram=[]; hexaQuery.value=''; 卦名.innerHTML=''; 爻變卦名.innerHTML=''; 卦數.innerHTML=''; 爻變卦數.innerHTML=''; isNgtn=true
+}
+function rndHex(obj, event){
+	if (!hexaQuery.value) return//event.preventDefault()
+	//console.log(hexaGram)
+	if (hexaGram.length==6){
+		hexaNum=hexaGram.join('')
+		//hexaNum=hexaGram.reverse().join('')
+		isHexible=false
+		//if(hexaGram[0]!=undefined)初爻.innerHTML=hexaGram[0]=='1'?yang:yin;
+		//if(hexaGram[1]!=undefined)二爻.innerHTML=hexaGram[1]=='1'?yang:yin;
+		//if(hexaGram[2]!=undefined)三爻.innerHTML=hexaGram[2]=='1'?yang:yin;
+		//if(hexaGram[3]!=undefined)四爻.innerHTML=hexaGram[3]=='1'?yang:yin;
+		//if(hexaGram[4]!=undefined)五爻.innerHTML=hexaGram[4]=='1'?yang:yin;
+		//if(hexaGram[5]!=undefined)上爻.innerHTML=hexaGram[5]=='1'?yang:yin;
+		data=JSON.stringify({'hexaNum':hexaNum})//return hexaGram.reverse().join('')
+		xhr.data_sent("{%url 'hexaNum'%}", data)
+		xhr.onreadystatechange=function(evt)
+			{ if(this.readyState==4 && this.status==200)
+				{ rspData=JSON.parse(this.responseText)
+					if(rspData.hexaURL){卦名.innerHTML='<a href='+rspData.hexaURL+'>'+rspData.本卦組合+'</a>';卦數.innerHTML=hexaNum}
+				else console.log('Not卦名')}
+			}
+	}
+	//function rndChoice(array) { return array[Math.floor(Math.random() * array.length)] }
+
+	if(isHexible){
+		if(Math.random()>.5) hexaGram.unshift('1')
+		else hexaGram.unshift('0');
+		/*HEXA.forEach(function(elmnt, idx) {
+			elmnt.innerHTML=hexaGram[idx]=='0'?yang:yin;
+		});*/
+		if(idx==5){上爻.innerHTML=hexaGram[0]=='1'?yin:yang}
+		if(idx==4){五爻.innerHTML=hexaGram[0]=='1'?yin:yang}
+		if(idx==3){四爻.innerHTML=hexaGram[0]=='1'?yin:yang}
+		if(idx==2){三爻.innerHTML=hexaGram[0]=='1'?yin:yang}
+		if(idx==1){二爻.innerHTML=hexaGram[0]=='1'?yin:yang}
+		if(!idx){初爻.innerHTML=hexaGram[0]=='1'  ?yin:yang}
+		idx+=1
+		//console.log(HEXA)
+	}
+	if(hexaGram.length==6){
+		ngtnHexa=hexaGram
+		console.log(hexaGram, ngtnHexa, ngtnHexa==hexaGram)
+		if(isNgtn){targetHexa=HEXA[Math.floor(Math.random() * HEXA.length)]
+			targetHexa.style='background:yellow'; isNgtn=false
+			xhr.data_sent("{%url '占卜'%}", JSON.stringify({命題:hexaQuery.value, hexaNum:hexaNum}))
+				xhr.onreadystatechange=function(evt) {
+					if(this.readyState==4 && this.status==200)
+						{ rspData=JSON.parse(this.responseText)
+							if(rspData.占卜)console.log('占卜成功')
+						else console.log('不成功') }
+				}
+
+			targetHexa.addEventListener('click', function(evt){
+				evtElemnt=evt.target.parentElement
+				ngtnHEXA.forEach(function(ele, idx){ ele.innerHTML=HEXA[idx].innerHTML })
+				hid=evtElemnt.getAttribute('hid')
+				nxtElemnt=evtElemnt.nextElementSibling
+				//console.log(nxtElemnt)//.src)
+				//ngtnHEXA[hid].firstChild
+				nxtElemnt.firstChild.src=evt.target.src.match(regexp)[0]=='yang.png'?yangURL:yinURL
+				//console.log(evtElemnt, hid, nxtElemnt.firstChild, evt.target.src.match(regexp)[0])//evt.target.parentElement)//.nextElemnt)
+				//console.log(nxtElemnt.firstChild, nxtElemnt.firstChild.src)
+				//console.log(HEXA[hid], nextElement.src)//evt.target.src.match(regexp)[0], ngtnHEXA[hid].firstChild.src)
+				//console.log(ngtnHEXA[5-hid].children[0].src)
+				console.log('hid before', hid, hexaGram, ngtnHexa, hexaGram==ngtnHexa)//hexaNum, ngtnNum)
+				ngtnHexa[hid]=parseInt(hexaGram[hid])==1?0:1
+				ngtnNum=ngtnHexa.join('')
+				console.log('hid after', hid, hexaNum, ngtnNum, hexaNum==ngtnNum)//hexaGram, ngtnHexa, hexaGram==ngtnHexa)//hexaNum, ngtnNum)
+				xhr.data_sent("{%url 'hexaNum'%}", JSON.stringify({'hexaNum':ngtnNum}));
+				xhr.onreadystatechange=function(evt)
+					{ if(this.readyState==4 && this.status==200)
+						{ rspData=JSON.parse(this.responseText)
+							if(rspData.hexaURL){爻變卦名.innerHTML='<a href='+rspData.hexaURL+'>'+rspData.本卦組合+'</a>';爻變卦數.innerHTML=ngtnNum}
+						else console.log('Not卦名')}
+					}
+			})
+		}
+		//HEXA.forEach(function(elmnt){
+			//elmnt.addEventListener('click', function(evt){
+				//爻變.innerHTML=本卦.innerHTML
+				//console.log(evt.target.src.match(regexp)[0])//=='yang.png'?'yin.png':'yang.png')
+				//console.log(ngtnHEXA[5-hid].children[0])
+		//})
+	}
+}
+</script>
+{%endblock SCRIPT%}
+{%block MAIN%}
+<!--
+<img src='{%static "medium/yin.png"%}'>
+<img src='{{MEDIA_URL}}medium/yin.png'>
+-->
+<div class=hexaSymbl>
+	<input type=text name=hexaQuery placeholder=hexaQuery required>
+	<button onclick='rndHex(this)'>click</button>
+	<button onclick='resetHex(this)'>reset</button>
+</div>
+<div style='display:flex; justify-content:center'>
+<div class=占卦>
+	<div><div>上爻</div><div class=本卦上爻 hid=0></div><div class=爻變上爻></div></div>
+	<div><div>五爻</div><div class=本卦五爻 hid=1></div><div class=爻變五爻></div></div>
+	<div><div>四爻</div><div class=本卦四爻 hid=2></div><div class=爻變四爻></div></div>
+	<div><div>三爻</div><div class=本卦三爻 hid=3></div><div class=爻變三爻></div></div>
+	<div><div>二爻</div><div class=本卦二爻 hid=4></div><div class=爻變二爻></div></div>
+	<div><div>初爻</div><div class=本卦初爻 hid=5></div><div class=爻變初爻></div></div>
+	<div><div>卦名</div><div class=本卦卦名></div><div class=爻變卦名></div></div>
+	<div><div>卦數</div><div class=本卦卦數></div><div class=爻變卦數></div></div>
+</div>
+</div>
+{%endblock MAIN%}
+<div class=爻變>
+</div>
+<div id=container>
+<div class=rowContainer style='justify-content:space-around; padding-bottom:30px; font-size:16px'>
+<a href={%url "卦爻辭" 卦.id%}>{{卦.本卦名}}</a>
+<div>錯<a href={%求卦名ID 卦.錯卦名%}>{{卦.錯卦名}}</a></div>
+<div>綜<a href={%求卦名ID 卦.綜卦名%}>{{卦.綜卦名}}</a></div>
+<div>複<a href={%求卦名ID 卦.複卦名%}>{{卦.複卦名}}</a></div>
+<div>雜<a href={%求卦名ID 卦.雜卦名%}>{{卦.雜卦名}}</a></div>
+</div>
+<div class=rowContainer>
+        <div>卦辭</div><div>{{卦爻.卦辭}}</div><div>{{錯卦爻.卦辭}}</div><div>{{綜卦爻.卦辭}}</div><div>{{複卦爻.卦辭}}</div><div>{{雜卦爻.卦辭}}</div>
+</div>
+{%if 卦.id <= 2%}
+<div class=rowContainer>
+        <div>卦辭文言曰</div><div>{{卦爻.卦辭文言曰}}</div>
+</div>
+{%endif%}
+<div class=rowContainer>
+        <div>卦辭彖曰</div><div>{{卦爻.卦辭彖曰}}</div><div>{{錯卦爻.卦辭彖曰}}</div><div>{{綜卦爻.卦辭彖曰}}</div><div>{{複卦爻.卦辭彖曰}}</div><div>{{雜卦爻.卦辭彖曰}}</div>
+</div>
+<div class=rowContainer>
+        <div>卦辭象曰</div><div>{{卦爻.卦辭象曰}}</div><div>{{錯卦爻.卦辭象曰}}</div><div>{{綜卦爻.卦辭象曰}}</div><div>{{複卦爻.卦辭象曰}}</div><div>{{雜卦爻.卦辭象曰}}</div>
+</div>
+<div class=rowContainer>
+        <div>雜卦傳</div><div>{{卦爻.雜卦傳}}</div><div>{{錯卦爻.雜卦傳}}</div><div>{{綜卦爻.雜卦傳}}</div><div>{{複卦爻.雜卦傳}}</div><div>{{雜卦爻.雜卦傳}}</div>
+</div>
+<div class=rowContainer>
+        <div>序卦傳</div><div>{{卦爻.序卦傳}}</div><div>{{錯卦爻.序卦傳}}</div><div>{{綜卦爻.序卦傳}}</div><div>{{複卦爻.序卦傳}}</div><div>{{雜卦爻.序卦傳}}</div>
+</div>
+<div class=rowContainer>
+        <div>初爻辭</div><div>{{卦爻.初爻辭}}</div><div>{{錯卦爻.初爻辭}}</div><div>{{綜卦爻.初爻辭}}</div><div>{{複卦爻.初爻辭}}</div><div>{{雜卦爻.初爻辭}}</div>
+</div>
+<div class=rowContainer>
+        <div>初爻象曰</div><div>{{卦爻.初爻象曰}}</div><div>{{錯卦爻.初爻象曰}}</div><div>{{綜卦爻.初爻象曰}}</div><div>{{複卦爻.初爻象曰}}</div><div>{{雜卦爻.初爻象曰}}</div>
+</div>
+<div class=rowContainer>
+        <div>二爻辭</div><div>{{卦爻.二爻辭}}</div><div>{{錯卦爻.二爻辭}}</div><div>{{綜卦爻.二爻辭}}</div><div>{{複卦爻.二爻辭}}</div><div>{{雜卦爻.二爻辭}}</div>
+</div>
+<div class=rowContainer>
+        <div>二爻象曰</div><div>{{卦爻.二爻象曰}}</div><div>{{錯卦爻.二爻象曰}}</div><div>{{綜卦爻.二爻象曰}}</div><div>{{複卦爻.二爻象曰}}</div><div>{{雜卦爻.二爻象曰}}</div>
+</div>
+<div class=rowContainer>
+        <div>三爻辭</div><div>{{卦爻.三爻辭}}</div><div>{{錯卦爻.三爻辭}}</div><div>{{綜卦爻.三爻辭}}</div><div>{{複卦爻.三爻辭}}</div><div>{{雜卦爻.三爻辭}}</div>
+</div>
+<div class=rowContainer>
+        <div>三爻象曰</div><div>{{卦爻.三爻象曰}}</div><div>{{錯卦爻.三爻象曰}}</div><div>{{綜卦爻.三爻象曰}}</div><div>{{複卦爻.三爻象曰}}</div><div>{{雜卦爻.三爻象曰}}</div>
+</div>
+<div class=rowContainer>
+        <div>四爻辭</div><div>{{卦爻.四爻辭}}</div><div>{{錯卦爻.四爻辭}}</div><div>{{綜卦爻.四爻辭}}</div><div>{{複卦爻.四爻辭}}</div><div>{{雜卦爻.四爻辭}}</div>
+</div>
+<div class=rowContainer>
+        <div>四爻象曰</div><div>{{卦爻.四爻象曰}}</div><div>{{錯卦爻.四爻象曰}}</div><div>{{綜卦爻.四爻象曰}}</div><div>{{複卦爻.四爻象曰}}</div><div>{{雜卦爻.四爻象曰}}</div>
+</div>
+<div class=rowContainer>
+        <div>五爻辭</div><div>{{卦爻.五爻辭}}</div><div>{{錯卦爻.五爻辭}}</div><div>{{綜卦爻.五爻辭}}</div><div>{{複卦爻.五爻辭}}</div><div>{{雜卦爻.五爻辭}}</div>
+</div>
+<div class=rowContainer>
+        <div>五爻象曰</div><div>{{卦爻.五爻象曰}}</div><div>{{錯卦爻.五爻象曰}}</div><div>{{綜卦爻.五爻象曰}}</div><div>{{複卦爻.五爻象曰}}</div><div>{{雜卦爻.五爻象曰}}</div>
+</div>
+<div class=rowContainer>
+        <div>上爻辭</div><div>{{卦爻.上爻辭}}</div><div>{{錯卦爻.上爻辭}}</div><div>{{綜卦爻.上爻辭}}</div><div>{{複卦爻.上爻辭}}</div><div>{{雜卦爻.上爻辭}}</div>
+</div>
+<div class=rowContainer>
+        <div>上爻象曰</div><div>{{卦爻.上爻象曰}}</div><div>{{錯卦爻.上爻象曰}}</div><div>{{綜卦爻.上爻象曰}}</div><div>{{複卦爻.上爻象曰}}</div><div>{{雜卦爻.上爻象曰}}</div>
+</div>
+</div>
